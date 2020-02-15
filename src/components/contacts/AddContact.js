@@ -14,7 +14,9 @@ class AddContact extends Component {
 
   onSubmit = e => {
     e.preventDefault();
+    
     const { name, email, phone } = this.state;
+    const { contacts } = this.props;
     if (name === '') {
       this.setState({ errors: { name: 'Name is required' } });
       return;
@@ -22,6 +24,12 @@ class AddContact extends Component {
 
     if (email === '') {
       this.setState({ errors: { email: 'Email is required' } });
+      return;
+    }
+
+    const res = contacts.filter(contact => contact.phone === phone)
+    if(res.length > 0){
+      this.setState({ errors: { phone: 'Phone Number Already Exist.' } });
       return;
     }
 
@@ -99,7 +107,11 @@ AddContact.propTypes = {
   addContact: PropTypes.func.isRequired
 };
 
+const mapStateToProps = state => ({
+  contacts: state.contact.contacts
+});
+
 export default connect(
-  null,
+  mapStateToProps,
   { addContact }
 )(AddContact);

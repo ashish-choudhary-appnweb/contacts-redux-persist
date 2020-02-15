@@ -12,13 +12,13 @@ class EditContact extends Component {
     errors: {}
   };
 
-  UNSAFE_componentWillReceiveProps(nextProps, nextState) {
-    const { name, email, phone } = nextProps.contact;
-    this.setState({
+  static getDerivedStateFromProps(props, state){
+    const { name, email, phone } = props.contact;
+    return {
       name,
       email,
       phone
-    });
+    }
   }
 
   componentDidMount() {
@@ -28,8 +28,8 @@ class EditContact extends Component {
 
   onSubmit = e => {
     e.preventDefault();
-
     const { name, email, phone } = this.state;
+    const { contacts, contact } = this.props;
     if (name === '') {
       this.setState({ errors: { name: 'Name is required' } });
       return;
@@ -38,6 +38,14 @@ class EditContact extends Component {
     if (email === '') {
       this.setState({ errors: { email: 'Email is required' } });
       return;
+    }
+
+    if(contact.phone !== phone) {
+      const res = contacts.filter(item => item.phone === phone)
+      if(res.length > 0){
+        this.setState({ errors: { phone: 'Phone Number Already Exist.' } });
+        return;
+      }
     }
 
     if(!(/^\d{10}$/.test(phone))){
@@ -121,7 +129,8 @@ EditContact.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  contact: state.contact.contact
+  contact: state.contact.contact,
+  contacts: state.contact.contacts
 });
 
 export default connect(
